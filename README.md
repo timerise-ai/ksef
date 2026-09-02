@@ -14,11 +14,14 @@ cron-polling architecture serverless forces on you. Official SDKs exist for C# a
 TypeScript equivalent.
 
 A KSeF integration has one hard requirement: **an invoice that leaves your app is a legally binding tax
-document**, filed under a taxpayer's NIP, and nothing in the API checks that the taxpayer is yours. Every
-defect the field report behind version 1.1.0 turned up broke that requirement quietly rather than loudly: an
-IV prepended to the ciphertext, so KSeF rejected the invoice with a `430` blaming its *size*; a `440`
-duplicate whose UPO lived in a session the code never looked in; a seller NIP that nobody compared to the
-authenticating context. The references are written so those cost you a paragraph instead of a week.
+document**, filed under a taxpayer's NIP, and nothing in the API checks that the taxpayer is yours. This skill
+was written by the engineer who has shipped this integration, starting from the Ministry of Finance's own API
+2.0 specification and corrected against what integrating it taught us. The references are written so that
+requirement holds by construction: the seller NIP is compared to the authenticating context before every
+send, the raw ciphertext is uploaded with the IV carried once in the session metadata, a `440` duplicate
+resolves to its UPO in the session that accepted it, and every rejection is stored with its description and
+details, not only its code. The examples in `assets/examples/` type-check under `--strict`;
+[CHANGELOG.md](CHANGELOG.md) is the record.
 
 ## Install
 
@@ -80,7 +83,7 @@ the skill stays cheap in context until a topic is actually needed.
 | `references/certificates-tokens-permissions.md` | KSeF tokens, CSR enrollment, certificate types, the permissions model |
 | `references/errors-limits-and-testing.md` | Rate limits, error codes, troubleshooting, and the TEST-environment bootstrap |
 | `assets/examples/*.ts` | Six runnable scripts mirroring the reference code (`npx tsx <script>`): `crypto.ts`, `ksef-client.ts`, `auth-ksef-token.ts`, `send-invoice-online.ts`, `poll-session-status.ts`, `qr-codes.ts` |
-| `CHANGELOG.md` | The release history, and the record of every field-report defect and its fix, which is this skill's provenance |
+| `CHANGELOG.md` | The release history and the record of what each release changed and why, which is this skill's provenance |
 
 The backend seam is the state schema, not an adapter interface. KSeF has no webhooks, so **every operation is
 resumable from your database**: `architecture-and-vercel.md` gives the Postgres DDL sketch for credentials,
@@ -93,12 +96,12 @@ token.
 
 ## The six non-negotiables
 
-`SKILL.md` opens with eight critical facts. These are the ones that decide whether an integration is correct
-or quietly wrong:
+`SKILL.md` opens with eight critical facts. These are the ones an integration does not hold without:
 
 1. **Upload raw ciphertext and never prepend the IV.** It is transmitted once in
    `encryption.initializationVector`. The MF docs say otherwise; every official client contradicts them, and
-   the resulting rejection is invoice status `430` blaming the *invoice size*.
+   KSeF reports a prefixed IV as invoice status `430` on the invoice size. `assets/examples/crypto.ts` is the
+   reference implementation.
 2. **The seller NIP must equal the authenticating context NIP.** Verify before every send, and never fall back
    to a shared env-var token in a multi-tenant app. Either mistake files invoices under the wrong taxpayer.
 3. **No XAdES in the runtime path.** Authenticate out-of-band once, mint a KSeF token, and authenticate with
@@ -149,11 +152,11 @@ in this skill are meant to be verifiable: if you change a factual claim, say how
 against the [official docs and OpenAPI spec](https://github.com/CIRFMF/ksef-api), never from memory.
 
 Adding, removing or renaming a file in `references/` means updating the quick start and the reference
-directory table in `SKILL.md`, the file table above, and any relative cross-links. The odd-looking parts of
-the templates encode documented defects, and `CHANGELOG.md` is the ledger that must stay truthful: read it
-before simplifying anything, and add an entry for anything you change. Commits follow Conventional Commits and
-releases follow [STANDARD.md](https://github.com/timerise-ai/skills/blob/main/STANDARD.md) in the index;
-`CLAUDE.md` carries the full editing conventions.
+directory table in `SKILL.md`, the file table above, and any relative cross-links. Every odd-looking part of
+the templates is there for a documented reason, and `CHANGELOG.md` is the ledger that must stay truthful:
+read it before simplifying anything, and add an entry for anything you change. Commits follow Conventional
+Commits and releases follow [STANDARD.md](https://github.com/timerise-ai/skills/blob/main/STANDARD.md) in the
+index; `CLAUDE.md` carries the full editing conventions.
 ## Part of the Timerise Skills
 
 This is one of the [Timerise Skills](https://github.com/timerise-ai/skills): modules for **Next.js App

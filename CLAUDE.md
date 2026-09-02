@@ -50,9 +50,9 @@ It is a **documentation artifact**, not an application. The deliverables are
 - **Do not remove the odd-looking parts.** Raw ciphertext with no IV prefix,
   CRC-8 over exactly 32 characters, `exceptionDetailList` read under
   `exception`, concatenating export parts before unzipping, the seller-NIP
-  equality check — each is a documented defect that cost a production
-  integration real time. `CHANGELOG.md` records which and why; read it before
-  "simplifying" anything.
+  equality check: each holds for a documented reason. `CHANGELOG.md` records
+  which release established it and why; read it before "simplifying"
+  anything.
 - **Volatile facts** (statutory dates, rate-limit numbers, Vercel platform
   limits) are deliberately phrased as snapshots with pointers to the live
   source (`GET /rate-limits`, podatki.gov.pl, Vercel docs). Keep that framing.

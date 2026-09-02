@@ -55,8 +55,7 @@ TypeScript/Node.js implementations and the deployment patterns for Vercel.
    included. **Upload the raw ciphertext: never prepend the IV to it.** The IV
    is transmitted once in `encryption.initializationVector`; the MF docs claim
    it is also a ciphertext prefix, but every official client contradicts that,
-   and prepending it produces invoice status `430` blaming the *invoice size*
-   — a false trail that costs days
+   and KSeF reports a prefixed IV as invoice status `430` on the invoice size
    ([crypto-and-client.md](references/crypto-and-client.md)).
 3. **No webhooks — KSeF never calls you.** All processing is async:
    submit → poll. On Vercel, poll via Cron routes (plus a short `after()`
@@ -70,7 +69,7 @@ TypeScript/Node.js implementations and the deployment patterns for Vercel.
    hourly caps* (e.g. 20 metadata queries/h). Sync KSeF to your own database;
    never proxy user clicks to the API. Handle 429 + `Retry-After` everywhere.
 7. **The seller NIP must equal the authenticating context NIP.** Nothing in
-   the API links your invoice data to your stored credentials — an unchecked
+   the API links your invoice data to your stored credentials, so an unchecked
    mismatch files legally binding invoices under the wrong taxpayer. Verify
    before every send, and never fall back to a shared env-var token in a
    multi-tenant app

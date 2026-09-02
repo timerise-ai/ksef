@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.4] - 2026-09-02
+
+Wording release. Templates and technical content are unchanged from 1.2.3.
+
+### Changed
+- README, `SKILL.md` and `CLAUDE.md` describe the integration by the properties the references
+  verify: seller NIP bound to the authenticating context, raw ciphertext with the IV carried once,
+  a `440` duplicate resolved to its UPO, rejections stored with their description. The record of
+  what each release changed stays in this changelog.
+
 ## [1.2.3] - 2026-09-02
 
 Documentation-only release. The skill itself, `SKILL.md` and `references/`, is
